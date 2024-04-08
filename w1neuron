@@ -1,0 +1,25 @@
+
+#code by patrick henaff
+
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+toM = 0.35
+toS = 3.5
+Af = 1
+sigmaS = 2
+sigmaF = 1.5
+w_inf = 0.5 #poids synaptique I_inj
+V0 = 0
+q0 = 0
+delta = 0.01
+
+def F(V, sigmaF):
+    return V - Af*np.tanh( V*(sigmaF/Af) )
+
+def f_V(V, sigmaF, q, I_inj, t):
+    #impulsion dirac pour faire démarrer le système
+    if t >=0 and t<=1:
+        I_inj = 1
+    # en cours return -(())
