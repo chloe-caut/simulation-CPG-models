@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-toM = 0.35
+toM = 0.35 #tau
 toS = 3.5
 Af = 1
 sigmaS = 2
@@ -22,4 +22,12 @@ def f_V(V, sigmaF, q, I_inj, t):
     #impulsion dirac pour faire démarrer le système
     if t >=0 and t<=1:
         I_inj = 1
-    # en cours return -(())
+    return  -(    ( F(V,sigmaF)+q-  w_inj*I_inj )  * (1/toM)  )
+
+def f_Q(q, V):
+    return (-q + sigmaS * V) / toS
+
+
+#methode d'euler pour rés les EDs
+
+#def Neurone_RS(V, sigmaF, q, )
