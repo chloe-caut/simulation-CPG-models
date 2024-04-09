@@ -30,4 +30,24 @@ def f_Q(q, V):
 
 #methode d'euler pour rés les EDs
 
-#def Neurone_RS(V, sigmaF, q, )
+def Neurone_RS(V, sigmaF, q, I_inj):
+    t=0
+    T=50 #def du temps de simul
+    list_V = []
+    list_T = []
+    list_I_inj = []
+    while t<T: 
+        V = V + f_V(V,sigmaF,q,I_inj,t) * delta
+        q = q + f_Q(q,V) * delta
+        t += delta
+        #print("Temps. ", t, V, I_inj)
+        list_V.append(V)
+        list_T.append(t)
+        list_I_inj.append(I_inj)
+    return list_V, list_T, list_I_inj
+
+Vs, Ts, I_inj = Neurone_RS(0, sigma_F, 0, 0)
+
+plt.plot(Ts, Vs)
+plt.plot(I_inj)
+plt.show()
