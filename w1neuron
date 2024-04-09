@@ -10,7 +10,7 @@ toS = 3.5
 Af = 1
 sigmaS = 2
 sigmaF = 1.5
-w_inf = 0.5 #poids synaptique I_inj
+w_inj = 0.5 #poids synaptique I_inj
 V0 = 0
 q0 = 0
 delta = 0.01
@@ -22,7 +22,7 @@ def f_V(V, sigmaF, q, I_inj, t):
     #impulsion dirac pour faire démarrer le système
     if t >=0 and t<=1:
         I_inj = 1
-    return  -(    ( F(V,sigmaF)+q-  w_inj*I_inj )  * (1/toM)  )
+    return  -(    ( F(V,sigmaF)+q-  w_inj *I_inj )  * (1/toM)  )
 
 def f_Q(q, V):
     return (-q + sigmaS * V) / toS
@@ -46,7 +46,7 @@ def Neurone_RS(V, sigmaF, q, I_inj):
         list_I_inj.append(I_inj)
     return list_V, list_T, list_I_inj
 
-Vs, Ts, I_inj = Neurone_RS(0, sigma_F, 0, 0)
+Vs, Ts, I_inj = Neurone_RS(0, sigmaF, 0, 0)
 
 plt.plot(Ts, Vs)
 plt.plot(I_inj)
