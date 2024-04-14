@@ -56,6 +56,42 @@ def Neurone_RS(V, sigmaF, q, I_inj):
 
 Vs, Ts, I_inj = Neurone_RS(0, sigmaF, 0, 0)
 
-plt.plot(Ts, Vs)
-#plt.plot(I_inj)   cette courbe fait tout bugger
+
+
+
+#### courbes avec Ts le temps
+plt.plot(Ts, Vs, '-m', label ='signal sortie')  # -b donne ligne bleur, b-- donne poitillé bleu
+
+
+#### labels axes
+plt.xlabel('temps')
+plt.ylabel('intensité sortie')
+
+
+##### titre haut
+plt.suptitle(
+    "lalalala",
+    fontsize=16,
+    fontweight="bold",
+    x=0.126,
+    y=0.98,
+    ha="left",
+)
+
+##### sous titre haut
+plt.title(
+    "avec un neurone",
+    fontsize=14,
+    pad=10,
+    loc="left",
+)
+
+#plt.ylim(-1,25) permet d'applatir la courbe selon y (inutile ici)
+
+
+#### le carré avec les labels
+plt.legend(loc='upper right')  
+
+
+#### important
 plt.show()
