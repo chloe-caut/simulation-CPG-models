@@ -70,7 +70,7 @@ plt.ylabel('intensité sortie')
 
 ##### titre haut
 plt.suptitle(
-    "lalalala",
+    "Etude théorique CPGs",
     fontsize=16,
     fontweight="bold",
     x=0.126,
