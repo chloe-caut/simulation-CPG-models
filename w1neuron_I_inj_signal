@@ -4,7 +4,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import math
+import math          #utilisé notamment pour les EDs mais aussi pout I_inj sinus
+import scipy.signal  #signal carrée
 
 
 # Le modèle de R&S est composé de 2 EDO1. Le couplage se fait à travers une fonction F
@@ -29,19 +30,30 @@ def F(V, sigmaF):
 
 
 
-
-def f_V(V, sigmaF, q, I_inj, t):
+#equa diff sur V pout I_inj constante, I_inj définie dans la focntion:
+#def f_V(V, sigmaF, q, I_inj, t):
     #impulsion dirac pour faire démarrer le système
-    if t >=0 and t<=1:
-        I_inj = 1
-    return     ( - F(V,sigmaF) -q + w_inj *I_inj     ) / toM  
+#   if t >=0 and t<=1:
+#     I_inj = 1
+#  return     ( - F(V,sigmaF) -q + w_inj *I_inj     ) / toM  
 
+#equa diff sur V
+#vars locales: I_inj est la valeur en t de la fct de forçage
+def f_V(V, sigmaF, q, I_inj, t):
+    #définition du signal I_inj
+    I_inj = scipy.signal.square(t, duty= 0.5)                 # ici pour I_inj  <--------------------------------------
+    sortie1= (   - F(V,sigmaF) -q + w_inj *I_inj     ) / toM                                 
+    return    sortie1 , I_inj #remplir une liste ici pour le tracé
+
+#equa diff sur q
 def f_Q(q, V):
     return (-q + sigmaS * V) / toS
 
 
-#methode d'euler pour rés les EDs
 
+#methode d'euler pour rés les EDs
+#la fct neurone appelle  chaque instant les valeurs de f_V donc is ok si I_inj en haut est une valeur simple
+#en sortie de neurone, 3 listes remplies au fur et  mesure
 def Neurone_RS(V, sigmaF, q, I_inj):
     t=0
     T= 40 #def du temps de simul (50 initialement)
@@ -49,23 +61,29 @@ def Neurone_RS(V, sigmaF, q, I_inj):
     list_T = []
     list_I_inj = []
     while t<T: 
-        V = V + f_V(V,sigmaF,q,I_inj,t) * delta
+        V = V + f_V(V,sigmaF,q,I_inj,t)[0] * delta      #f_v retourne à présent la fct ET I_inj! 
         q = q + f_Q(q,V) * delta
         t += delta
         #print("Temps. ", t, V, I_inj)
         list_V.append(V)
         list_T.append(t)
-        list_I_inj.append(I_inj)  #i inj ne bouge pas et fait toujours 0 ici
+        list_I_inj.append(f_V(V,sigmaF,q,I_inj,t)[1])         # I_inj deuxieme sortie de f_v
     return list_V, list_T, list_I_inj
 
-Vs, Ts, I_inj = Neurone_RS(0, sigmaF, 0, 0)
 
+#appel final: 3 listes en résultat: Signal de sortie du neurone Vs, liste de temps Ts à mettre en abscisse, et I_inj le signal d'entrée/forçage
+Vs, Ts, I_inj = Neurone_RS(0, sigmaF, 0, 0)   
+
+
+########################################################
+###                      dessin                      ###
+########################################################
 
 
 
 #### courbes avec Ts le temps
-plt.plot(Ts, Vs, '-m', label ='signal sortie')  # -b donne ligne bleur, b-- donne poitillé bleu
-
+plt.plot(Ts, Vs, '-m',    label ='Vs - signal sortie')  # -b donne ligne bleur, b-- donne poitillé bleu
+plt.plot(Ts, I_inj, 'g--', label ='I_inj - signal entrée/forçage') 
 
 #### labels axes
 plt.xlabel('temps')

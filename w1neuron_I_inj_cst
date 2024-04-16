@@ -1,5 +1,5 @@
 
-#code by patrick henaff
+#code by patrick henaff, légèrement modifié
 
 import numpy as np
 import matplotlib.pyplot as plt
