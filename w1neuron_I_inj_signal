@@ -1,0 +1,101 @@
+
+#cmodif 1, obj= réponse à un signal cool
+#brouillon lets go!!! 
+
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+
+# Le modèle de R&S est composé de 2 EDO1. Le couplage se fait à travers une fonction F
+#les 2 tau sont séparés d'un facteur 10 pour représenter l'effet chimique et l'effet électrique
+toM = 0.35                   #0.35
+toS = 3.5                    #3.5
+
+#paramètres de la fonction F
+Af = 1                       #1
+# 1.5 le premier à régler
+sigmaF = 3
+# 2
+sigmaS = 2
+
+w_inj = 0.5                  # 0.5 poids synaptique I_inj
+V0 = 0                       #0
+q0 = 0                       #0
+delta = 0.01                 #0.01
+
+def F(V, sigmaF):
+    return V - Af*np.tanh( V*(sigmaF/Af) )
+
+
+
+
+def f_V(V, sigmaF, q, I_inj, t):
+    #impulsion dirac pour faire démarrer le système
+    if t >=0 and t<=1:
+        I_inj = 1
+    return     ( - F(V,sigmaF) -q + w_inj *I_inj     ) / toM  
+
+def f_Q(q, V):
+    return (-q + sigmaS * V) / toS
+
+
+#methode d'euler pour rés les EDs
+
+def Neurone_RS(V, sigmaF, q, I_inj):
+    t=0
+    T= 40 #def du temps de simul (50 initialement)
+    list_V = []
+    list_T = []
+    list_I_inj = []
+    while t<T: 
+        V = V + f_V(V,sigmaF,q,I_inj,t) * delta
+        q = q + f_Q(q,V) * delta
+        t += delta
+        #print("Temps. ", t, V, I_inj)
+        list_V.append(V)
+        list_T.append(t)
+        list_I_inj.append(I_inj)  #i inj ne bouge pas et fait toujours 0 ici
+    return list_V, list_T, list_I_inj
+
+Vs, Ts, I_inj = Neurone_RS(0, sigmaF, 0, 0)
+
+
+
+
+#### courbes avec Ts le temps
+plt.plot(Ts, Vs, '-m', label ='signal sortie')  # -b donne ligne bleur, b-- donne poitillé bleu
+
+
+#### labels axes
+plt.xlabel('temps')
+plt.ylabel('intensité sortie')
+
+
+##### titre haut
+plt.suptitle(
+    "Etude théorique CPGs",
+    fontsize=16,
+    fontweight="bold",
+    x=0.126,
+    y=0.98,
+    ha="left",
+)
+
+##### sous titre haut
+plt.title(
+    "avec un neurone",
+    fontsize=14,
+    pad=10,
+    loc="left",
+)
+
+#plt.ylim(-1,25) permet d'applatir la courbe selon y (inutile ici)
+
+
+#### le carré avec les labels
+plt.legend(loc='upper right')  
+
+
+#### important
+plt.show()
