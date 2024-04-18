@@ -1,11 +1,20 @@
+#testons cela
 
-#cmodif 1, obj= réponse à un signal cool
-#brouillon lets go!!! 
+#modif 2, obj= implémeter l'apprentissage hebbian pour un neurone
+#se emt en évdence en ayant I_inj qui change de forme, ou devient nulle 
+#après un certain temps, dans un mode où la réponse à une impulsion ne 
+#serait PAS de rester en oscillation ad vitam eternam!!!
 
 import numpy as np
 import matplotlib.pyplot as plt
 import math          #utilisé notamment pour les EDs mais aussi pout I_inj sinus
-import scipy.signal  #signal carrée
+#import scipy.signal  #signal carrée
+
+
+
+########################################################
+###                   paramétrage                    ###
+########################################################  
 
 
 # Le modèle de R&S est composé de 2 EDO1. Le couplage se fait à travers une fonction F
@@ -24,6 +33,13 @@ w_inj = 0.5                  # 0.5 poids synaptique I_inj
 V0 = 0                       #0
 q0 = 0                       #0
 delta = 0.01                 #0.01
+
+
+
+########################################################
+###                        EDS                       ###
+########################################################  
+
 
 def F(V, sigmaF):
     return V - Af*np.tanh( V*(sigmaF/Af) )
@@ -51,6 +67,12 @@ def f_Q(q, V):
 
 
 
+
+########################################################
+###                    résolution                    ###
+########################################################  
+
+
 #methode d'euler pour rés les EDs
 #la fct neurone appelle  chaque instant les valeurs de f_V donc is ok si I_inj en haut est une valeur simple
 #en sortie de neurone, 3 listes remplies au fur et  mesure
@@ -73,6 +95,8 @@ def Neurone_RS(V, sigmaF, q, I_inj):
 
 #appel final: 3 listes en résultat: Signal de sortie du neurone Vs, liste de temps Ts à mettre en abscisse, et I_inj le signal d'entrée/forçage
 Vs, Ts, I_inj = Neurone_RS(0, sigmaF, 0, 0)   
+
+
 
 
 ########################################################
