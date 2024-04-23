@@ -8,7 +8,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math          #utilisé notamment pour les EDs mais aussi pout I_inj sinus
-#import scipy.signal  #signal carrée
+import scipy.signal  #signal carrée
 
 
 
@@ -27,7 +27,7 @@ Af = 1                       #1
 # 1.5 le premier à régler
 sigmaF = 3
 # 2
-sigmaS = 2
+#sigmaS = 2
 
 w_inj = 0.5                  # 0.5 poids synaptique I_inj
 V0 = 0                       #0
@@ -46,31 +46,51 @@ def F(V, sigmaF):
 
 
 
-#equa diff sur V pout I_inj constante, I_inj définie dans la focntion:
-#def f_V(V, sigmaF, q, I_inj, t):
-    #impulsion dirac pour faire démarrer le système
-#   if t >=0 and t<=1:
-#     I_inj = 1
-#  return     ( - F(V,sigmaF) -q + w_inj *I_inj     ) / toM  
-
 #equa diff sur V
 #vars locales: I_inj est la valeur en t de la fct de forçage
 def f_V(V, sigmaF, q, I_inj, t):
-    #définition du signal I_inj
-    I_inj = scipy.signal.square(t, duty= 0.5)                 # ici pour I_inj  <--------------------------------------
-    sortie1= (   - F(V,sigmaF) -q + w_inj *I_inj     ) / toM                                 
+    # ---------------------------------------------------------------------------  < --- définition du signal I_inj
+    I_inj = scipy.signal.square(t, duty= 0.5)           
+    # ---------------------------------------------------------------------------  < --- définition de ED sur V     
+    #sortie1= (   - F(V,sigmaF) -q + w_inj *I_inj     ) / toM       pour sans apprentissage
+    # sigmaF = f(I_inj) à présent
+    sortie1= (   - F(V,sigmaF) -q + w_inj *I_inj     ) / toM                          
     return    sortie1 , I_inj #remplir une liste ici pour le tracé
 
 #equa diff sur q
 def f_Q(q, V):
-    return (-q + sigmaS * V) / toS
+    # ---------------------------------------------------------------------------  < --- définition de ED sur q    
+    # ---------------------------------------------------------------------------  < --- APP HEBBIEN ICI UNIQUEMENT????? 
+
+    return (-q + solveSigmaS() * V) / toS
 
 
+#pour plasticité hebbienne
+# freq learning
+def sigmaSpt():
+        # ---------------------------------------------------------------------------  < --- def formule sigmaS ici   
+    sSp = 2 * w_inj * I_inj * sqrt(toM * toS) * sqrt(1 + sismaS + sigmaF ) * V / sqrt(Vpt *Vpt + V*V) 
+    return sSp
 
 
 ########################################################
 ###                    résolution                    ###
 ########################################################  
+
+
+#liste t ici, à changer !!!!!
+def solveSigmaS():
+    t=0
+    T= 40 
+    list_S = []
+    list_T = []
+    S=0 #maybe
+    while t<T: 
+        S = S + sigmaSpt() * delta    
+        t += delta
+        list_S.append(S)
+        #list_T.append(t)
+    return list_S
 
 
 #methode d'euler pour rés les EDs
