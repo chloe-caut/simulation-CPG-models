@@ -8,7 +8,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math          #utilisé notamment pour les EDs mais aussi pout I_inj sinus
-import scipy.signal  #signal carrée
+import scipy.signal  #signal carré
 
 
 
