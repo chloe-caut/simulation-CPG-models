@@ -27,7 +27,7 @@ Af = 1                       #1
 # 1.5 le premier à régler
 sigmaF = 3
 # 2
-#sigmaS = 2
+sigmaS = 2
 
 w_inj = 0.5                  # 0.5 poids synaptique I_inj
 V0 = 0                       #0
@@ -62,14 +62,14 @@ def f_Q(q, V):
     # ---------------------------------------------------------------------------  < --- définition de ED sur q    
     # ---------------------------------------------------------------------------  < --- APP HEBBIEN ICI UNIQUEMENT????? 
 
-    return (-q + solveSigmaS() * V) / toS
+    return (-q + incrSigmaS(sigmaS, V) * V) / toS
 
 
 #pour plasticité hebbienne
-# freq learning
-def sigmaSpt():
+# freq learning ---- ici on calcule la dérivée
+def sigmaSpt(SIGMA,V):
         # ---------------------------------------------------------------------------  < --- def formule sigmaS ici   
-    sSp = 2 * w_inj * I_inj * sqrt(toM * toS) * sqrt(1 + sismaS + sigmaF ) * V / sqrt(Vpt *Vpt + V*V) 
+    sSp = 2 * w_inj * f_V(V,sigmaF,q,I_inj,t)[1] * sqrt(toM * toS) * sqrt(1 + SIGMA + sigmaF ) * V / sqrt(Vpt *Vpt + V*V)  #truc a rallong = Iinj
     return sSp
 
 
@@ -78,8 +78,13 @@ def sigmaSpt():
 ########################################################  
 
 
-#liste t ici, à changer !!!!!
-def solveSigmaS():
+#fonction uniquement incrémentale - à refaire 
+def incrSigmaS(S,V):
+    return S + sigmaSpt(S, V) * delta # sigma + derivée de sigma * delta t
+
+#apprentissage fenêtre 
+'''
+def solveSigmaSwindow():
     t=0
     T= 40 
     list_S = []
@@ -90,8 +95,8 @@ def solveSigmaS():
         t += delta
         list_S.append(S)
         #list_T.append(t)
-    return list_S
-
+    return list_S   #ne pas retourner une liste si on a besoin d'une valeur dans fQ
+'''
 
 #methode d'euler pour rés les EDs
 #la fct neurone appelle  chaque instant les valeurs de f_V donc is ok si I_inj en haut est une valeur simple
@@ -105,6 +110,7 @@ def Neurone_RS(V, sigmaF, q, I_inj):
     while t<T: 
         V = V + f_V(V,sigmaF,q,I_inj,t)[0] * delta      #f_v retourne à présent la fct ET I_inj! 
         q = q + f_Q(q,V) * delta
+        sigmaS= incrSigmaS(sigmaS,V)
         t += delta
         #print("Temps. ", t, V, I_inj)
         list_V.append(V)
