@@ -62,14 +62,15 @@ def f_Q(q, V):
     # ---------------------------------------------------------------------------  < --- définition de ED sur q    
     # ---------------------------------------------------------------------------  < --- APP HEBBIEN ICI UNIQUEMENT????? 
 
-    return (-q + incrSigmaS(sigmaS, V) * V) / toS
+    return (-q + incrSigmaS(sigmaS, V,q) * V) / toS
 
 
 #pour plasticité hebbienne
 # freq learning ---- ici on calcule la dérivée
-def sigmaSpt(SIGMA,V):
+def sigmaSpt(SIGMA,V,q):
         # ---------------------------------------------------------------------------  < --- def formule sigmaS ici   
     sSp = 2 * w_inj * f_V(V,sigmaF,q,I_inj,t)[1] * sqrt(toM * toS) * sqrt(1 + SIGMA + sigmaF ) * V / sqrt(Vpt *Vpt + V*V)  #truc a rallong = Iinj
+    
     return sSp
 
 
@@ -79,8 +80,8 @@ def sigmaSpt(SIGMA,V):
 
 
 #fonction uniquement incrémentale - à refaire 
-def incrSigmaS(S,V):
-    return S + sigmaSpt(S, V) * delta # sigma + derivée de sigma * delta t
+def incrSigmaS(S,V,q):
+    return S + sigmaSpt(S, V,q) * delta # sigma + derivée de sigma * delta t
 
 #apprentissage fenêtre 
 '''
@@ -100,7 +101,7 @@ def solveSigmaSwindow():
 
 #methode d'euler pour rés les EDs
 #la fct neurone appelle  chaque instant les valeurs de f_V donc is ok si I_inj en haut est une valeur simple
-#en sortie de neurone, 3 listes remplies au fur et  mesure
+#en sortie de neurone, 3 listes remplies au fur et à mesure
 def Neurone_RS(V, sigmaF, q, I_inj):
     t=0
     T= 40 #def du temps de simul (50 initialement)
@@ -110,7 +111,7 @@ def Neurone_RS(V, sigmaF, q, I_inj):
     while t<T: 
         V = V + f_V(V,sigmaF,q,I_inj,t)[0] * delta      #f_v retourne à présent la fct ET I_inj! 
         q = q + f_Q(q,V) * delta
-        sigmaS= incrSigmaS(sigmaS,V)
+        sigmaS= incrSigmaS(sigmaS,V,q)
         t += delta
         #print("Temps. ", t, V, I_inj)
         list_V.append(V)
