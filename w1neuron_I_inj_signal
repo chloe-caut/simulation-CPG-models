@@ -41,7 +41,13 @@ def F(V, sigmaF):
 #vars locales: I_inj est la valeur en t de la fct de forçage
 def f_V(V, sigmaF, q, I_inj, t):
     #définition du signal I_inj
-    I_inj = scipy.signal.square(t, duty= 0.5)                 # ici pour I_inj  <--------------------------------------
+    #I_inj = scipy.signal.square(t, duty= 0.5)                 # ici pour I_inj  <-----------------------------------------------
+    #-------------------------------------------------------------------------------ici i inj sinus a freq variable
+    amplitude  = 1
+    freq = 1
+    phase=0
+    I_inj = amplitude * math.sin(6.28 * freq * t + phase )
+
     sortie1= (   - F(V,sigmaF) -q + w_inj *I_inj     ) / toM                                 
     return    sortie1 , I_inj #remplir une liste ici pour le tracé
 

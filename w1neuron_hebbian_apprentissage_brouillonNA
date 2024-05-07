@@ -5,6 +5,9 @@
 #après un certain temps, dans un mode où la réponse à une impulsion ne 
 #serait PAS de rester en oscillation ad vitam eternam!!!
 
+
+#BROUILLON NON ABOUTI REMPLACE DIRECT PAR NOTATION OBJ
+
 import numpy as np
 import matplotlib.pyplot as plt
 import math          #utilisé notamment pour les EDs mais aussi pout I_inj sinus
