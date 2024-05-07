@@ -13,7 +13,7 @@ import scipy.signal
 V0 = 0
 q0 = 0
 dt = 0.01
-eps = 0.1
+eps = 0.1  
 
 class NeuroneRS : pass  #car pas vraie prog obj
 
@@ -86,7 +86,7 @@ def f_sigmaS(n,t):
     y= f_V(n,t) #premier appel la presque derivée 
     sousRacine =  y**2 + (n.V)**2 #les carrés
     racine = math.sqrt( sousRacine ) #la racine
-    quotient = y/ racine if racine else 0    #la division
+    quotient = y/ racine #if racine else 0    #la division #################################################################################ici le if else 0
     sigmasuivant = 2 * eps * n.I_inj * math.sqrt(n.toM*n.toS) * math.sqrt(1+ n.sigmaS - n.sigmaF) *      quotient
     # 2 * eps * n.I_inj * math.sqrt(n.toM*n.toS) * math.sqrt(1+ n.sigmaS - n.sigmaF) *    f_V(n,t) /  math.sqrt( f_V(n,t)**2 + (n.V)**2  )
     return sigmasuivant
@@ -139,7 +139,7 @@ def simul(n):
     return list_V, list_T, list_I_inj, list_sigmaS
 
 
-neur1 = create_NRS(nom='RS1', I_inj = 0.0,w_inj=0.1, V=0.0, sigmaS=2.0 ,sigmaF=1.5)
+neur1 = create_NRS(nom='RS1', I_inj = 0.0,w_inj=0.1, V=0.001, sigmaS=2.0 ,sigmaF=1.5)
 #neur2 = create_NRS(nom='RS2', I_inj = 0.0,w_inj=0.5, V=0.0, sigmaS=2.0 ,sigmaF=1.5)
 
 
