@@ -16,8 +16,8 @@ import scipy.signal
 #w_inj = 0.5 #poids synaptique I_inj
 V0 = 0.01
 q0 = 0.01
-dt = 0.01
-eps = 0.1  
+dt = 0.001
+eps = 0.01  
 
 class NeuroneRS : pass  #car pas vraie prog obj
 
@@ -28,7 +28,7 @@ class NeuroneRS : pass  #car pas vraie prog obj
 ########################################################  
 
 
-def create_NRS(nom='RS1', I_inj = 0.0,w_inj=0.5, V=0.001, sigmaS=2.0 ,sigmaF=1.5,Af = 1,q=0.0):
+def create_NRS(nom='RS1', I_inj = 0.0,w_inj=0.5, V=0.001, sigmaS=2.0 ,sigmaF=1.5,Af = 1,q=0.0):  #valeurs placeholder
     neurone = NeuroneRS()
     neurone.nom =  nom 
     neurone.I_inj = I_inj  # courant d'entrée:  peut etre une somme de courants
@@ -54,6 +54,9 @@ def F(n):
 
 #signal de forçage, appelé I_inj mais une ou deux fois F dans les articles: ne pas confondre.
 def Input(t) :
+    amplitude  = 1
+    freq = 0.3
+    phase=0
     #dirac
     '''
     I=0
@@ -63,12 +66,23 @@ def Input(t) :
     #carré
     #I= scipy.signal.square(t, duty= 0.5) 
 
+    #forme spéciale test dirqc puis sin puis silence pour voir si hebb 
+    #'''
+    if t<=2:
+        I=0
+    if t>=3 and t<=4:
+        I=1
+    if t>4 and t<=7:
+        I=0
+    if t>7 and t<40:
+        I = amplitude * math.sin(6.28 * freq * t + phase )
+    else:
+        I=0
+    #'''
+
     #sin
-     #-------------------------------------------------------------------------------ici i inj sinus a freq variable
-    amplitude  = 1
-    freq = 0.2
-    phase=0
-    I = amplitude * math.sin(6.28 * freq * t + phase )
+    #-------------------------------------------------------------------------------ici i inj sinus a freq variable
+    #I = amplitude * math.sin(6.28 * freq * t + phase )
 
     return I
      
@@ -83,7 +97,7 @@ def f_Q(n,t):
 
 
 
-#créatrice de pbs: 
+#hebb 
 def f_sigmaS(n,t):
     #print("fv ",f_V(n,t))  #nan si Input sinus math, ok si input carré scipy
     #breakpoints pour voir d'ou vient le pb
@@ -92,6 +106,7 @@ def f_sigmaS(n,t):
     racine = math.sqrt( sousRacine ) #la racine
     quotient = y/ racine #if racine else 0    #la division #################################################################################ici le if else 0
     sigmasuivant = 2 * eps * n.I_inj * math.sqrt(n.toM*n.toS) * math.sqrt(1+ n.sigmaS - n.sigmaF) *      quotient
+    
     # 2 * eps * n.I_inj * math.sqrt(n.toM*n.toS) * math.sqrt(1+ n.sigmaS - n.sigmaF) *    f_V(n,t) /  math.sqrt( f_V(n,t)**2 + (n.V)**2  )
     return sigmasuivant
 
@@ -112,16 +127,16 @@ def f_sigmaS(n,t):
 
 def simul(n):
     t = 0
-    T = 50                                               # définition du temps de simulation --------------------------------tests ici
+    T = 60                                               # définition du temps de simulation --------------------------------tests ici
     list_V = []
     list_T = []
     list_I_inj = []
     list_sigmaS=[]
 
-    #----------------------------------------------------------------ici on +1 les neurones
+    #----------------------------------------------------------------intégration par méhode d'euler, incrémentation sur les neurones
     while t < T:
         n.I_inj = Input(t)
-        n.sigmaS = n.sigmaS + dt* f_sigmaS(n,t)
+        n.sigmaS = n.sigmaS # + dt* f_sigmaS(n,t) # --------------------------------------------------------------test ici pour enlever hebb
         n.V      = n.V      + dt* f_V(n,t)
         n.q      = n.q      + dt* f_Q(n,t)
         #test
@@ -143,7 +158,7 @@ def simul(n):
     return list_V, list_T, list_I_inj, list_sigmaS
 
 
-neur1 = create_NRS(nom='RS1', I_inj = 0.01,w_inj= 0.001 , V=0.001, sigmaS=2.0 ,sigmaF=1.5) #------------------------------------tests ici w inj
+neur1 = create_NRS(nom='RS1', I_inj = 0.01,w_inj= 0.5 , V=0.001, sigmaS=1.0 ,sigmaF=2) #------------------------------------tests ici w inj
 #neur2 = create_NRS(nom='RS2', I_inj = 0.0,w_inj=0.5, V=0.0, sigmaS=2.0 ,sigmaF=1.5)
 
 
@@ -163,7 +178,7 @@ Vs1,Ts1, I_inj1, liste_sigma_s = simul(neur1)
 
 
 def plot(Vs1, Ts1, I_inj1, sigmaS):
-    fig, axs = plt.subplots(3, 1, figsize=(10, 18))
+    fig, axs = plt.subplots(2, 1, figsize=(10, 18))
 
     ##### titre haut
     plt.suptitle(
@@ -187,23 +202,26 @@ def plot(Vs1, Ts1, I_inj1, sigmaS):
     )'''
 
     # First subplot
-    axs[1].plot(Ts1, I_inj1, 'y--')       #label='I_inj - signal de forçage')
-    axs[1].set_xlabel('temps')
-    axs[1].set_ylabel('I_inj - signal de forçage')
-    #axs[1].legend(loc='upper right')
+    axs[0].plot(Ts1, I_inj1, '-y', label='I_inj - signal de forçage')
+    axs[0].plot(Ts1, Vs1, '-m', label='Vs - signal sortie')
+    axs[0].set_xlabel('temps')
+    axs[0].set_ylabel('potentiel')
+    axs[0].legend(loc='upper right')
     #axs[1].set_title('I_inj - signal de forçage')
     
-    # Second subplot
-    axs[0].plot(Ts1, Vs1, '-m')           #label='Vs - signal sortie')
-    axs[0].set_xlabel('temps')
-    axs[0].set_ylabel('Vs - signal sortie')
+    '''
+    # Second subplot enlevé pour superposer entrée et sortie
+    axs[1].plot(Ts1, Vs1, '-m')           #label='Vs - signal sortie')
+    axs[1].set_xlabel('temps')
+    axs[1].set_ylabel('Vs - signal sortie')
     #axs[0].legend(loc='upper right')
     #axs[0].set_title('Vs - signal sortie')
-    
+    '''
+
     # Third subplot
-    axs[2].plot(Ts1, liste_sigma_s, 'b-')      #label='sigma S')
-    axs[2].set_xlabel('temps')
-    axs[2].set_ylabel('sigma S')
+    axs[1].plot(Ts1, liste_sigma_s, 'b-')      #label='sigma S')
+    axs[1].set_xlabel('temps')
+    axs[1].set_ylabel('sigma S')
     #axs[2].legend(loc='upper right')
     #axs[2].set_title('sigma S')
     
