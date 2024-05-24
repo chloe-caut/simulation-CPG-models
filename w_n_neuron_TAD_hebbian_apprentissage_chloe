@@ -28,7 +28,7 @@ class NeuroneRS : pass  #car pas vraie prog obj
 ########################################################  
 
 
-def create_NRS(nom='RS1', I_inj = 0.0,w_inj=0.5, V=0.001, sigmaS=2.0 ,sigmaF=1.5,Af = 1,q=0.0):  #valeurs placeholder
+def create_NRS(nom, I_inj ,w_inj, V, sigmaS ,sigmaF,Af ,q):  #valeurs placeholder
     neurone = NeuroneRS()
     neurone.nom =  nom 
     neurone.I_inj = I_inj  # courant d'entrée:  peut etre une somme de courants
@@ -48,9 +48,6 @@ def create_NRS(nom='RS1', I_inj = 0.0,w_inj=0.5, V=0.001, sigmaS=2.0 ,sigmaF=1.5
 ###          fonctions basiques nécessaire           ###
 ######################################################## 
 
-#fonction crée pour raccourcir la notation, aussi appelée F dans les articles
-def F(n):
-    return n.V-n.Af*np.tanh((n.sigmaF/n.Af)*n.V)
 
 #signal de forçage, appelé I_inj mais une ou deux fois F dans les articles: ne pas confondre.
 def Input(t) :
@@ -85,12 +82,15 @@ def Input(t) :
     #I = amplitude * math.sin(6.28 * freq * t + phase )
 
     return I
-     
-#notation incrémentale à venir à cause de l'intégration    
 
+#fonction crée pour raccourcir la notation, aussi appelée F dans les articles
+def F(n):
+    return n.V - n.Af * np.tanh( (n.sigmaF/n.Af)*n.V )
+
+
+#ces deux la sont techniquement des dV/dt et dq/dt. on ne les calcule que pour les intégrer ensuite   
 def f_V(n, t):
-    #attention ici j'utilise la fct input --------------------------------------------------------
-    return  - (F(n)+ n.q - n.w_inj *n.I_inj)  /n.toM
+    return  -( F(n) + n.q - n.w_inj *n.I_inj )  /n.toM
 
 def f_Q(n,t):
     return (-n.q + n.sigmaS*n.V) /n.toS
@@ -98,17 +98,16 @@ def f_Q(n,t):
 
 
 #hebb 
+#traité aussi comme un dsigmas/dt
 def f_sigmaS(n,t):
-    #print("fv ",f_V(n,t))  #nan si Input sinus math, ok si input carré scipy
-    #breakpoints pour voir d'ou vient le pb
-    y= f_V(n,t) #premier appel la presque derivée 
+    y= f_V(n,t) #y=dV/dt
     sousRacine =  y**2 + (n.V)**2 #les carrés
     racine = math.sqrt( sousRacine ) #la racine
     quotient = y/ racine #if racine else 0    #la division #################################################################################ici le if else 0
-    sigmasuivant = 2 * eps * n.I_inj * math.sqrt(n.toM*n.toS) * math.sqrt(1+ n.sigmaS - n.sigmaF) *      quotient
+    sigmaspoint = 2 * eps * n.I_inj * math.sqrt(n.toM*n.toS) * math.sqrt(1+ n.sigmaS - n.sigmaF) *      quotient
     
     # 2 * eps * n.I_inj * math.sqrt(n.toM*n.toS) * math.sqrt(1+ n.sigmaS - n.sigmaF) *    f_V(n,t) /  math.sqrt( f_V(n,t)**2 + (n.V)**2  )
-    return sigmasuivant
+    return sigmaspoint
 
 
 ########################################################
@@ -158,15 +157,16 @@ def simul(n):
     return list_V, list_T, list_I_inj, list_sigmaS
 
 
-neur1 = create_NRS(nom='RS1', I_inj = 0.01,w_inj= 0.5 , V=0.001, sigmaS=1.0 ,sigmaF=2) #------------------------------------tests ici w inj
+
+########################################################
+###                set param and run                 ###
+######################################################## 
+#setting paramètres
+neur1 = create_NRS(nom='RS1', I_inj = 0.01,w_inj= 0.5 , V=0.001, sigmaS=1.0 ,sigmaF=2, Af=1, q=0) #------------------------------------tests ici w inj
 #neur2 = create_NRS(nom='RS2', I_inj = 0.0,w_inj=0.5, V=0.0, sigmaS=2.0 ,sigmaF=1.5)
 
-
+#run ici
 Vs1,Ts1, I_inj1, liste_sigma_s = simul(neur1)
-
-#print(liste_sigma_s)
-
-
 
 
 
