@@ -1,6 +1,6 @@
 
 #version à utiliser
-# python3 w_n_neuron_TAD_hebbian_apprentissage_chloe
+# python3 w_n_neuron_TAD_hebb_chloe_utilisedansv5
 
 import numpy as np
 import matplotlib.pyplot as plt
