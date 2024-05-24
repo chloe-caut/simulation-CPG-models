@@ -17,7 +17,7 @@ import scipy.signal
 V0 = 0.01
 q0 = 0.01
 dt = 0.001
-eps = 0.01  
+eps = 0.5
 
 class NeuroneRS : pass  #car pas vraie prog obj
 
@@ -65,13 +65,9 @@ def Input(t) :
 
     #forme spéciale test dirqc puis sin puis silence pour voir si hebb 
     #'''
-    if t<=2:
+    if t<=15:
         I=0
-    if t>=3 and t<=4:
-        I=1
-    if t>4 and t<=7:
-        I=0
-    if t>7 and t<40:
+    if t>15 and t<40:
         I = amplitude * math.sin(6.28 * freq * t + phase )
     else:
         I=0
@@ -135,7 +131,7 @@ def simul(n):
     #----------------------------------------------------------------intégration par méhode d'euler, incrémentation sur les neurones
     while t < T:
         n.I_inj = Input(t)
-        n.sigmaS = n.sigmaS # + dt* f_sigmaS(n,t) # --------------------------------------------------------------test ici pour enlever hebb
+        n.sigmaS = n.sigmaS  + dt* f_sigmaS(n,t)  # --------------------------------------------------------------test ici pour enlever hebb
         n.V      = n.V      + dt* f_V(n,t)
         n.q      = n.q      + dt* f_Q(n,t)
         #test
@@ -150,7 +146,7 @@ def simul(n):
 
         list_V.append(n.V)
         list_T.append(t)  
-        list_I_inj.append(Input(t))  
+        list_I_inj.append(n.I_inj)  
         list_sigmaS.append(n.sigmaS)
         
 
@@ -162,7 +158,7 @@ def simul(n):
 ###                set param and run                 ###
 ######################################################## 
 #setting paramètres
-neur1 = create_NRS(nom='RS1', I_inj = 0.01,w_inj= 0.5 , V=0.001, sigmaS=1.0 ,sigmaF=2, Af=1, q=0) #------------------------------------tests ici w inj
+neur1 = create_NRS(nom='RS1', I_inj = 0.01,w_inj= 0.5 , V=0.001, sigmaS=1.1 ,sigmaF=2, Af=1, q=0) #------------------------------------tests ici w inj
 #neur2 = create_NRS(nom='RS2', I_inj = 0.0,w_inj=0.5, V=0.0, sigmaS=2.0 ,sigmaF=1.5)
 
 #run ici
