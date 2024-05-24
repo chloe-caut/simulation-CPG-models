@@ -1,3 +1,7 @@
+
+#version à utiliser
+# python3 w_n_neuron_TAD_hebbian_apprentissage_chloe
+
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -10,8 +14,8 @@ import scipy.signal
 #sigmaS = 2
 #"sigmaF = 1.5"
 #w_inj = 0.5 #poids synaptique I_inj
-V0 = 0
-q0 = 0
+V0 = 0.01
+q0 = 0.01
 dt = 0.01
 eps = 0.1  
 
@@ -24,7 +28,7 @@ class NeuroneRS : pass  #car pas vraie prog obj
 ########################################################  
 
 
-def create_NRS(nom='RS1', I_inj = 0.0,w_inj=0.5, V=0.0, sigmaS=2.0 ,sigmaF=1.5,Af = 1,q=0.0):
+def create_NRS(nom='RS1', I_inj = 0.0,w_inj=0.5, V=0.001, sigmaS=2.0 ,sigmaF=1.5,Af = 1,q=0.0):
     neurone = NeuroneRS()
     neurone.nom =  nom 
     neurone.I_inj = I_inj  # courant d'entrée:  peut etre une somme de courants
@@ -62,7 +66,7 @@ def Input(t) :
     #sin
      #-------------------------------------------------------------------------------ici i inj sinus a freq variable
     amplitude  = 1
-    freq = 2
+    freq = 0.2
     phase=0
     I = amplitude * math.sin(6.28 * freq * t + phase )
 
@@ -108,7 +112,7 @@ def f_sigmaS(n,t):
 
 def simul(n):
     t = 0
-    T = 20                                               # définition du temps de simulation
+    T = 50                                               # définition du temps de simulation --------------------------------tests ici
     list_V = []
     list_T = []
     list_I_inj = []
@@ -139,7 +143,7 @@ def simul(n):
     return list_V, list_T, list_I_inj, list_sigmaS
 
 
-neur1 = create_NRS(nom='RS1', I_inj = 0.0,w_inj=0.1, V=0.001, sigmaS=2.0 ,sigmaF=1.5)
+neur1 = create_NRS(nom='RS1', I_inj = 0.01,w_inj= 0.001 , V=0.001, sigmaS=2.0 ,sigmaF=1.5) #------------------------------------tests ici w inj
 #neur2 = create_NRS(nom='RS2', I_inj = 0.0,w_inj=0.5, V=0.0, sigmaS=2.0 ,sigmaF=1.5)
 
 
@@ -154,11 +158,70 @@ Vs1,Ts1, I_inj1, liste_sigma_s = simul(neur1)
 
 
 ########################################################
-###                      dessin                      ###
+###                    dessin  3 figs                ###
 ########################################################  
 
 
+def plot(Vs1, Ts1, I_inj1, sigmaS):
+    fig, axs = plt.subplots(3, 1, figsize=(10, 18))
 
+    ##### titre haut
+    plt.suptitle(
+        "Etude théorique CPGs - 1 neurone  -  w_inj= " + str(neur1.w_inj) + "  - eps = " + str(eps),
+        fontsize=14,
+        #fontweight="bold",
+        x=0.09,
+        y=1,
+        ha="left",
+    )
+    '''
+    #section qui ne marche plus avec les subplots
+    ##### sous titre haut
+    plt.title(
+        '1 neurone, w_inj= ' + str(neur1.w_inj) + ', eps = ' + str(eps) ,
+        fontsize=14,
+        pad=10,
+        x=0.08,
+        y=1,
+        loc="left",
+    )'''
+
+    # First subplot
+    axs[1].plot(Ts1, I_inj1, 'y--')       #label='I_inj - signal de forçage')
+    axs[1].set_xlabel('temps')
+    axs[1].set_ylabel('I_inj - signal de forçage')
+    #axs[1].legend(loc='upper right')
+    #axs[1].set_title('I_inj - signal de forçage')
+    
+    # Second subplot
+    axs[0].plot(Ts1, Vs1, '-m')           #label='Vs - signal sortie')
+    axs[0].set_xlabel('temps')
+    axs[0].set_ylabel('Vs - signal sortie')
+    #axs[0].legend(loc='upper right')
+    #axs[0].set_title('Vs - signal sortie')
+    
+    # Third subplot
+    axs[2].plot(Ts1, liste_sigma_s, 'b-')      #label='sigma S')
+    axs[2].set_xlabel('temps')
+    axs[2].set_ylabel('sigma S')
+    #axs[2].legend(loc='upper right')
+    #axs[2].set_title('sigma S')
+    
+    # Adjust layout to prevent overlap
+    plt.tight_layout()
+
+    # Display the plot
+    plt.show()
+
+plot(Vs1, Ts1, I_inj1, liste_sigma_s)
+
+
+
+########################################################
+###                 dessin 1 fig                     ###
+######################################################## 
+
+'''
 plt.plot(Ts1, Vs1,    '-m',        label ='Vs - signal sortie')
 plt.plot(Ts1, I_inj1,'y--',    label ='I_inj - signal de forçage')
 plt.plot(Ts1, liste_sigma_s, 'b-', label= 'sigma S')
@@ -181,8 +244,9 @@ plt.suptitle(
 )
 
 ##### sous titre haut
+# autre syntaxe possible: plt.title('x= '+str(x)+', y = '+str(y))
 plt.title(
-    "avec un neurone et apprentissage hebbien",
+    '1 neurone, w_inj= ' + str(neur1.w_inj) + ', eps = ' + str(eps) ,
     fontsize=14,
     pad=10,
     loc="left",
@@ -193,3 +257,4 @@ plt.legend(loc='upper right')
 
 
 plt.show()
+'''
