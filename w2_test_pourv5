@@ -1,7 +1,5 @@
 
-#version à utiliser
-#oui titrage with n neurons mais n=1 ici
-
+#et maintenant avec 2 neurones
 # python3 w_n_neuron_TAD_hebb_chloe_utilisedansv5
 
 import numpy as np
