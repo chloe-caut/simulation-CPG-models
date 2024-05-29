@@ -1,6 +1,6 @@
 
 #et maintenant avec 2 neurones
-# python3 w_n_neuron_TAD_hebb_chloe_utilisedansv5
+# python3 w2_test_pourv5
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -64,7 +64,7 @@ def Input(t) :
     #carré
     #I= scipy.signal.square(t, duty= 0.5) 
 
-    #forme spéciale test dirqc puis sin puis silence pour voir si hebb 
+    #forme spéciale te￼st dirqc puis sin puis silence pour voir si hebb 
     '''
     if t<=15:
         I=0
@@ -160,12 +160,15 @@ def simul(n):
 ######################################################## 
 #setting paramètres
 neur1 = create_NRS(nom='RS1', I_inj = 0.01,w_inj= 0.5 , V=0.001, sigmaS=30,sigmaF=2, Af=0.2, q=0) #------------------------------------tests ici w inj anien af1 apres 0.1 pas mal
-#neur2 = create_NRS(nom='RS2', I_inj = 0.0,w_inj=0.5, V=0.0, sigmaS=2.0 ,sigmaF=1.5)
+neur2 = create_NRS(nom='RS2', I_inj = 0.01,w_inj=0.5, V=0.001, sigmaS=30 ,sigmaF=2, Af=0.2, q=0)
 
 #run ici
-Vs1,Ts1, I_inj1, liste_sigma_s = simul(neur1)
+Vs1,Ts1, I_inj1, liste_sigma_s1 = simul(neur1)
+Vs2,Ts2, I_inj2, liste_sigma_s2 = simul(neur2)
 
-
+Vaddition =[]
+for i in range(len(Vs1)):
+    Vaddition.append(Vs1[i]+Vs2[i])
 
 
 
@@ -174,8 +177,8 @@ Vs1,Ts1, I_inj1, liste_sigma_s = simul(neur1)
 ########################################################  
 
 
-def plot(Vs1, Ts1, I_inj1, sigmaS):
-    fig, axs = plt.subplots(2, 1, figsize=(10, 18))
+def plot():
+    fig, axs = plt.subplots(5, 1, figsize=(10, 18))
 
     ##### titre haut
     plt.suptitle(
@@ -198,12 +201,28 @@ def plot(Vs1, Ts1, I_inj1, sigmaS):
         loc="left",
     )'''
 
-    # First subplot
+    # neurone 1
     axs[0].plot(Ts1, I_inj1, '-y', label='I_inj - signal de forçage')
-    axs[0].plot(Ts1, Vs1, '-m', label='Vs - signal sortie')
+    axs[0].plot(Ts1, Vs1, '-m', label='Vs - sortie neurone 1')
     axs[0].set_xlabel('temps')
     axs[0].set_ylabel('potentiel')
     axs[0].legend(loc='upper right')
+    #axs[1].set_title('I_inj - signal de forçage')
+
+        # neurone 2
+    axs[1].plot(Ts2, I_inj2, '-y', label='I_inj - signal de forçage')
+    axs[1].plot(Ts2, Vs2, '-m', label='Vs - sortie neurone 2')
+    axs[1].set_xlabel('temps')
+    axs[1].set_ylabel('potentiel')
+    axs[1].legend(loc='upper right')
+    #axs[1].set_title('I_inj - signal de forçage')
+
+            # addiion
+    axs[2].plot(Ts2, I_inj2, '-y', label='I_inj - signal de forçage')
+    axs[2].plot(Ts2, Vaddition, '-m', label='Vs - sortie n1 + n2')
+    axs[2].set_xlabel('temps')
+    axs[2].set_ylabel('potentiel')
+    axs[2].legend(loc='upper right')
     #axs[1].set_title('I_inj - signal de forçage')
     
     '''
@@ -215,12 +234,20 @@ def plot(Vs1, Ts1, I_inj1, sigmaS):
     #axs[0].set_title('Vs - signal sortie')
     '''
 
-    # Third subplot
-    axs[1].plot(Ts1, liste_sigma_s, 'b-')      #label='sigma S')
-    axs[1].set_xlabel('temps')
-    axs[1].set_ylabel('sigma S')
+    # neurone 1
+    axs[3].plot(Ts1, liste_sigma_s1, 'b-')      #label='sigma S')
+    axs[3].set_xlabel('temps')
+    axs[3].set_ylabel('sigma S neurone 1')
     #axs[2].legend(loc='upper right')
     #axs[2].set_title('sigma S')
+
+        # neurone 2
+    axs[4].plot(Ts2, liste_sigma_s2, 'b-')      #label='sigma S')
+    axs[4].set_xlabel('temps')
+    axs[4].set_ylabel('sigma S neurone 2')
+    #axs[2].legend(loc='upper right')
+    #axs[2].set_title('sigma S')
+
     
     # Adjust layout to prevent overlap
     plt.tight_layout()
@@ -228,7 +255,7 @@ def plot(Vs1, Ts1, I_inj1, sigmaS):
     # Display the plot
     plt.show()
 
-plot(Vs1, Ts1, I_inj1, liste_sigma_s)
+plot()
 
 
 
